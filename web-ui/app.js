@@ -48,6 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const botMessageDiv = appendMessage('AI', '');
 
     try {
+      // Format prompt for Gemma Instruct model
+      const gemmaPrompt = `<start_of_turn>user\n${prompt}<end_of_turn>\n<start_of_turn>model\n`;
+
       const response = await fetch('/v1/completions', {
         method: 'POST',
         headers: {
@@ -55,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         body: JSON.stringify({
           model: modelInput.value,
-          prompt: prompt,
+          prompt: gemmaPrompt,
           max_tokens: parseInt(maxTokensSlider.value),
           temperature: parseFloat(tempSlider.value),
           stream: false // vLLM supports streaming, but let's start simple.
