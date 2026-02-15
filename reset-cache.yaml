@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: image-cleaner
+  labels:
+    app: image-cleaner
+spec:
+  selector:
+    matchLabels:
+      app: image-cleaner
+  template:
+    metadata:
+      labels:
+        app: image-cleaner
+    spec:
+      hostPID: true
+      hostNetwork: true
+      containers:
+      - name: cleaner
+        image: ubuntu
+        securityContext:
+          privileged: true
+        command: ["nsenter", "--target", "1", "--mount", "--uts", "--ipc", "--net", "--pid", "--", "bash", "-c"]
+        args:
+        - |
+          echo "Cleaning images..."
+          # Target specific image to avoid breaking system pods
+          # We remove the image by reference to ensure all tags are gone
+          crictl rmi nvidia/cuda:12.2.0-devel-ubuntu22.04 || echo "Image not found or already deleted"
+          
+          # Optional: Prune strictly unused images if needed (more aggressive)
+          # crictl rmi --prune
+          
+          echo "Done."
+          sleep 3600

@@ -1,0 +1,7 @@
+apiVersion: "node.gke.io/v1"
+kind: GCPResourceAllowlist
+metadata:
+  name: gke-secondary-boot-disk-allowlist
+spec:
+  allowedResourcePatterns:
+  - "projects/amirma-private2/global/images/.*"

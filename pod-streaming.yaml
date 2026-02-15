@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: streaming-loader
+  labels:
+    app: large-image-streaming
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: large-image-streaming
+  template:
+    metadata:
+      labels:
+        app: large-image-streaming
+    spec:
+      nodeSelector:
+        cloud.google.com/gke-image-streaming: "true"
+      containers:
+      - name: cuda-container
+        image: nvidia/cuda:12.2.0-devel-ubuntu22.04
+        imagePullPolicy: Always
+        command: ["sh", "-c", "echo 'Image pulled!' && sleep 3600"]
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "512Mi"
