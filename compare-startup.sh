@@ -88,3 +88,10 @@ echo "Results:"
 echo "Standard Pull:   ${std_duration}s"
 echo "Image Streaming: ${str_duration}s"
 echo "============================================"
+
+echo ""
+echo "--- FINAL CLEANUP ---"
+echo "Cleaning up resources..."
+kubectl delete -f pod-standard.yaml --ignore-not-found=true --wait=true >/dev/null 2>&1
+kubectl delete -f pod-streaming.yaml --ignore-not-found=true --wait=true >/dev/null 2>&1
+echo "Cleanup complete."
