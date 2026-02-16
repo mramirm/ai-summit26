@@ -1,0 +1,21 @@
+apiVersion: cloud.google.com/v1
+kind: ComputeClass
+metadata:
+  name: l4
+spec:
+  autopilot:
+    enabled: true
+  activeMigration:
+    optimizeRulePriority: true
+  nodePoolAutoCreation:
+    enabled: true
+  priorities:
+    - gpu:
+        count: 2
+        driverVersion: latest
+      machineType: g2-standard-24
+      storage:
+        secondaryBootDisks:
+          - diskImageName: vllm-disk-image-sec
+            mode: CONTAINER_IMAGE_CACHE
+  whenUnsatisfiable: ScaleUpAnyway

@@ -122,7 +122,7 @@ run_measurement() {
     GRAPH_TIME=$(echo "$LOGS" | grep "Graph capturing finished" | sed -E 's/.*finished in ([0-9.]+) secs.*/\1/' | head -n 1)
 
     # Store results in variables for comparison
-    if [[ "$MODE" == "Standard" ]]; then
+    if [[ "$MODE" == "GCS Fuse" ]]; then
         S_NODE_PROV=$NODE_PROV; S_PULL=$PULL_TIME; S_RUNTIME=$RUNTIME_START; S_TOTAL=$TOTAL_WALL
         S_LOAD=${LOAD_TIME:-0}; S_COMPILE=${COMPILE_TIME:-0}; S_GRAPH=${GRAPH_TIME:-0}
     else
@@ -143,10 +143,10 @@ run_measurement() {
 
 # Handle arguments
 if [[ "$1" == "--compare" ]]; then
-    echo "Entering Comparison Mode: Standard vs AI Model Streamer"
+    echo "Entering Comparison Mode: GCS Fuse vs AI Model Streamer"
     
-    # Run Standard
-    run_measurement "Standard" "vllm-deployment.yaml" "model-server" "inference-server"
+    # Run GCS Fuse
+    run_measurement "GCS Fuse" "vllm-deployment.yaml" "model-server" "inference-server"
     
     # Run RunAI
     run_measurement "RunAI" "vllm-deployment-runai.yaml" "model-server-runai" "vllm-container"
@@ -154,7 +154,7 @@ if [[ "$1" == "--compare" ]]; then
     echo -e "\n========================================================"
     echo "           STARTUP PERFORMANCE COMPARISON"
     echo "========================================================"
-    printf "%-25s | %-12s | %-12s\n" "Metric" "Standard" "RunAI"
+    printf "%-25s | %-12s | %-12s\n" "Metric" "GCS Fuse" "RunAI"
     echo "--------------------------------------------------------"
     printf "%-25s | %-10ss | %-10ss\n" "Node Provisioning" "$S_NODE_PROV" "$R_NODE_PROV"
     printf "%-25s | %-10ss | %-10ss\n" "Image Pulling" "$S_PULL" "$R_PULL"
@@ -169,15 +169,15 @@ if [[ "$1" == "--compare" ]]; then
     # Calculate improvement
     DIFF=$((S_TOTAL - R_TOTAL))
     if [ $DIFF -gt 0 ]; then
-        echo "RunAI is ${DIFF}s faster than Standard."
+        echo "RunAI is ${DIFF}s faster than GCS Fuse."
     else
-        echo "Standard is $(( -DIFF ))s faster than RunAI."
+        echo "GCS Fuse is $(( -DIFF ))s faster than RunAI."
     fi
 
 elif [[ "$1" == "--runai" ]]; then
     echo "Mode: AI Model Streamer (models.gke.io)"
     run_measurement "RunAI" "vllm-deployment-runai.yaml" "model-server-runai" "vllm-container"
 else
-    echo "Mode: Standard (GCS Fuse Sidecar)"
-    run_measurement "Standard" "vllm-deployment.yaml" "model-server" "inference-server"
+    echo "Mode: GCS Fuse (Standard Sidecar)"
+    run_measurement "GCS Fuse" "vllm-deployment.yaml" "model-server" "inference-server"
 fi
